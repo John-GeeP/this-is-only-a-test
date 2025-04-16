@@ -5,32 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>edu.jgp</groupId>
+        <groupId>edu.thisisatest</groupId>
         <artifactId>this-is-only-a-test</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>module3-sen-content</artifactId>
     <packaging>jar</packaging>
-
-    <dependencies>
-        <!-- TestNG dependency is managed by the parent. -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Selenium dependency -->
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-        </dependency>
-
-        <!-- WebDriverManager dependency -->
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-        </dependency>
-    </dependencies>
 </project>
