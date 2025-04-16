@@ -1,10 +1,47 @@
-# IntelliJ IDEA settings
+# Compiled class files and build output
+**/target/
+**/out/
+
+# Maven specific files
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IntelliJ IDEA files
 .idea/
 *.iml
+*.iws
+.idea_modules/
+*.ipr
 
-# Maven target directory
-target/
+# Eclipse files (if any)
+.project
+.classpath
+.settings/
 
-# OS files
+# NetBeans files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# OS-generated files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# System files
+*.swp
+*~
+
+# Local configuration files (optional)
+*.local

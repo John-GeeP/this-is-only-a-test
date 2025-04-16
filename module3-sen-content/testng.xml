@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="ContentTestSuite" parallel="false">
+    <test name="ContentTests">
+        <classes>
+            <class name="edu.sen.ContentTest"/>
+        </classes>
+    </test>
+</suite>

@@ -1,83 +1,89 @@
-# Automation Testing Project
+# this-is-only-a-test: Wikipedia Automation Testing Project
 
-This project provides a basic setup for automation testing on Wikipedia using Selenium with Maven and TestNG. The project is organized as a multi‑module Maven project.
+This project demonstrates basic automation testing on Wikipedia using Selenium, TestNG, and Maven. It is organized as a multi‑module Maven project where each module addresses a distinct testing area:
 
-## Project Structure
-
-- **module_1**: Contains a simple TestNG test that opens Chrome, navigates to [Wikipedia](https://www.wikipedia.com), holds for 2 seconds, validates that the title contains "Wikipedia", and closes the browser.
-- **module_2 - module_4**: Placeholders for future test modules.
-
-## Prerequisites
-
-- **JDK**: Make sure you have Java (JDK 24 or adjust in `pom.xml` if necessary) installed.
-- **Maven**: Install Maven and add it to your system PATH.
-- **Chrome Browser**: Ensure that Google Chrome is installed.
-- **ChromeDriver**:  
-  Download the appropriate version of `chromedriver.exe` (from chrome driver-win64) and update the path in `module_1/src/test/java/com/example/tests/WikipediaTest.java`.  
-  Alternatively, you can use [WebDriverManager](https://github.com/bonigarcia/webdrivermanager) (already included in dependencies) to manage the driver automatically.
-
-## Running the Tests
-
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/yourusername/automation-testing-project.git
-   cd automation-testing-project
-
-2. **Import as a Maven Project in IntelliJ IDEA:**
-
-- Open IntelliJ IDEA.
-- Select File > Open and navigate to the project root.
-- Open the root pom.xml to load all modules.
-
-3. **ChromeDriver Configuration:**
-
-- The chromedriver.exe is located in module1/drivers/.
-- The test uses a relative path to locate the driver so no absolute path configuration is necessary.
-
-4. **Build and Run Tests:**
-
-To build the project, run:
-```
-mvn clean compile
-```
-
-To execute tests, run:
-```
-mvn clean test
-```
+- **module1-jgp-navigation:** Navigation tests
+- **module2-tmi-authentication:** Authentication tests
+- **module3-sen-content:** Content tests
+- **module4-chf-search:** Search functionality tests
 
 ## Project Structure
+
 ```
 this-is-only-a-test/
 ├── .gitignore
 ├── README.md
-├── pom.xml                          # Parent POM
-├── module1/                         # Contains the Selenium test
-│   ├── pom.xml                      # Module1 POM
-│   ├── drivers/
-│   │   └── chromedriver.exe
-│   └── src/
-│       ├── main/java/
-│       │   └── edu/JGP/module1/      
-│       └── test/java/
-│           └── edu/JGP/module1/
-│               └── WikipediaTest.java
-├── module2/                         # Template module
-│   ├── pom.xml
-│   └── src/main/java/
-│       └── edu/JGP/module2/
-├── module3/                         # Template module
-│   ├── pom.xml
-│   └── src/main/java/
-│       └── edu/JGP/module3/
-└── module4/                         # Template module
 ├── pom.xml
-└── src/main/java/
-└── edu/JGP/module4/
+├── module1-jgp-navigation/
+│   ├── pom.xml
+│   ├── src/
+│   │   └── test/java/edu/jgp/NavigationTest.java
+│   └── testng.xml
+├── module2-tmi-authentication/
+│   ├── pom.xml
+│   └── src/
+│       └── test/java/edu/tmi/AuthenticationTest.java
+│   └── testng.xml
+├── module3-sen-content/
+│   ├── pom.xml
+│   └── src/
+│       └── test/java/edu/sen/ContentTest.java
+│   └── testng.xml
+└── module4-chf-search/
+    ├── pom.xml
+    └── src/
+        └── test/java/edu/chf/SearchTest.java
+    └── testng.xml
 ```
 
+## Prerequisites
+
+- **JDK:** Install Java (we use JDK 24; adjust in `pom.xml` if needed).
+- **Maven:** Ensure Maven is installed and available in your system PATH.
+- **Chrome Browser:** Google Chrome must be installed.
+- **ChromeDriver:** WebDriverManager automatically manages drivers.
+chromedriver.exe is not required.
+
+## Running the Project
+
+### Build the Project
+
+From the root directory, run:
+
+```bash
+mvn clean install
+```
+
+This command will compile all modules and install the artifacts into your local Maven repository.
+
+### Run the Tests
+
+You can run tests for individual modules or for all modules together. For example, to run the content tests (module3):
+
+Navigate to the module directory:
+
+```bash
+cd module3-sen-content
+```
+
+Run the tests using Maven:
+
+```bash
+mvn clean test
+```
+
+Alternatively, open the corresponding `testng.xml` file in your IDE (IntelliJ IDEA, Eclipse, etc.) and run the suite directly.
 
 ## Future Development
-Further tests, modules, and functionality 
-(such as clicking links, changing modes, signing in, editing, etc.) 
-will be added following the structure established in module1.
+
+Future enhancements include:
+
+- Fully implementing navigation, authentication, and search modules.
+- Extending functionality to cover scenarios such as clicking links, switching modes, signing in/out, editing articles, etc.
+- Refining test assertions and integrating continuous integration.
+
+## License
+
+This project is provided as-is for educational purposes.
+
+---
