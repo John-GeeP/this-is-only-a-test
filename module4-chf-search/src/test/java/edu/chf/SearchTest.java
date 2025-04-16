@@ -1,21 +1,5 @@
 package edu.chf;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-/**
- * Placeholder test for Wikipedia search functionality.
- */
-public class SearchTest {
-
-    @Test
-    public void testSearchPlaceholder() {
-        System.out.println("Module4 - SearchTest: Placeholder test executed.");
-        Assert.assertTrue(true, "Placeholder assertion passed.");
-    }
-}
-
-/*
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -25,7 +9,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
-public class C4 {
+public class SearchTest {
     private WebDriver driver;
     private WebDriverWait wait;
 
@@ -557,7 +541,7 @@ public class C4 {
     }
 
     public static void main(String[] args) {
-        C4 tests = new C4();
+        SearchTest tests = new SearchTest();
         tests.runAllTests();
     }
-}*/
+}
