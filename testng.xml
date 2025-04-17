@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="this-is-only-a-test" verbose="1">
+
+    <suite-files>
+        <suite-file path="module1-jgp-navigation/testng.xml"/>
+        <suite-file path="module2-tmi-authentication/testng.xml"/>
+        <suite-file path="module3-sen-content/testng.xml"/>
+        <suite-file path="module4-chf-search/testng.xml"/>
+    </suite-files>
+
+</suite>
