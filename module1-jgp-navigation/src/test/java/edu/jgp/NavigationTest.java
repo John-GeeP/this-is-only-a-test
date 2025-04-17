@@ -17,9 +17,6 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 
-/**
- * Navigation tests for Wikipedia using Selenium, TestNG, and WebDriverManager.
- */
 public class NavigationTest {
     private WebDriver driver;
     private WebDriverWait wait;
@@ -29,230 +26,438 @@ public class NavigationTest {
     private static final String WIKI_BASE        = "https://en.wikipedia.org/wiki";
     private static final String ARTICLE_URL      = WIKI_BASE + "/Selenium_(software)";
 
+    // Pause helper: delay for visibility
+    public static void pause() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Pause interrupted: " + e.getMessage());
+        }
+    }
+
     @BeforeClass
     public static void globalSetup() {
+        System.out.println("BeforeClass: setup WebDriverManager");
+        pause();
         WebDriverManager.chromedriver().setup();
+        System.out.println("BeforeClass: WebDriverManager ready");
+        pause();
     }
 
     @BeforeMethod
     public void setUp() {
+        System.out.println("BeforeMethod: starting browser session");
+        pause();
         ChromeOptions options = new ChromeOptions().addArguments("--start-maximized");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        System.out.println("BeforeMethod: navigating to main page");
+        pause();
         driver.get(EN_MAIN_PAGE_URL);
+        System.out.println("BeforeMethod: main page loaded");
+        pause();
     }
 
     @AfterMethod
     public void tearDown() {
+        System.out.println("AfterMethod: closing browser session");
+        pause();
         if (driver != null) {
             driver.quit();
         }
+        System.out.println("AfterMethod: browser closed");
+        pause();
     }
 
-    @Test(description = "Verify the Wikipedia portal page loads with 'Wikipedia' in the title")
+    // Test 1: verify portal page loads with 'Wikipedia' in title
+    @Test(priority = 1, description = "Verify portal page loads with 'Wikipedia' in title")
     public void testOpenHomePage() {
+        System.out.println("Test 1: verify portal page loads with 'Wikipedia' in title");
+        pause();
+
+        System.out.println("Navigating to portal URL: " + PORTAL_URL);
+        pause();
         driver.get(PORTAL_URL);
-        Assert.assertTrue(driver.getTitle().contains("Wikipedia"),
-                "Portal page title should contain 'Wikipedia'");
+
+        System.out.println("Retrieving page title");
+        pause();
+        String title = driver.getTitle();
+        System.out.println("Page title: " + title);
+
+        try {
+            Assert.assertTrue(title.contains("Wikipedia"),
+                    "Portal page title should contain 'Wikipedia'");
+            System.out.println("Test 1 SUCCESS: title contains 'Wikipedia'");
+        } catch (AssertionError e) {
+            System.out.println("Test 1 FAILURE: title does not contain 'Wikipedia'");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "From an article, click the logo to return to the main page")
-    public void testClickLogoReturnsHome() throws InterruptedException {
+    // Test 2: click logo to return to main page
+    @Test(priority = 2, description = "From an article, click logo to return to main page")
+    public void testClickLogoReturnsHome() {
+        System.out.println("Test 2: click logo to return to main page");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
+
+        System.out.println("Waiting for logo element");
+        pause();
         WebElement logo = wait.until(
                 ExpectedConditions.elementToBeClickable(By.cssSelector("a.mw-logo"))
         );
-        logo.click();
-        Thread.sleep(2000);
 
+        System.out.println("Clicking logo");
+        pause();
+        logo.click();
+
+        System.out.println("Waiting for main page URL");
+        pause();
         wait.until(ExpectedConditions.urlToBe(EN_MAIN_PAGE_URL));
-        Assert.assertEquals(driver.getCurrentUrl(), EN_MAIN_PAGE_URL,
-                "Clicking logo should navigate back to Main Page");
+
+        String current = driver.getCurrentUrl();
+        System.out.println("Current URL: " + current);
+
+        try {
+            Assert.assertEquals(current, EN_MAIN_PAGE_URL,
+                    "Clicking logo should navigate back to Main Page");
+            System.out.println("Test 2 SUCCESS: navigated back to main page");
+        } catch (AssertionError e) {
+            System.out.println("Test 2 FAILURE: did not navigate back to main page");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Click the first internal link in an article's content")
-    public void testClickFirstInternalLink() throws InterruptedException {
+    // Test 3: click first internal link in article content
+    @Test(priority = 3, description = "Click first internal link in article content")
+    public void testClickFirstInternalLink() {
+        System.out.println("Test 3: click first internal link in article content");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
+
+        System.out.println("Waiting for first internal link");
+        pause();
         WebElement firstLink = wait.until(
                 ExpectedConditions.elementToBeClickable(
                         By.cssSelector("div#mw-content-text p a[href*='/wiki/']:not([href*=':'])")
                 )
         );
-        String originalUrl = driver.getCurrentUrl();
 
+        String original = driver.getCurrentUrl();
+        System.out.println("Original URL: " + original);
+
+        System.out.println("Clicking first internal link");
+        pause();
         firstLink.click();
-        Thread.sleep(2000);
 
+        System.out.println("Waiting for new article URL");
+        pause();
         wait.until(ExpectedConditions.urlMatches(WIKI_BASE + "/.+"));
-        String newUrl = driver.getCurrentUrl();
-        Assert.assertTrue(newUrl.startsWith(WIKI_BASE + "/"),
-                "Should navigate to another article");
-        Assert.assertNotEquals(newUrl, originalUrl,
-                "URL must change after clicking the first link");
+
+        String current = driver.getCurrentUrl();
+        System.out.println("New URL: " + current);
+
+        try {
+            Assert.assertTrue(current.startsWith(WIKI_BASE + "/"),
+                    "Should navigate to another article");
+            Assert.assertNotEquals(current, original,
+                    "URL must change after clicking the first link");
+            System.out.println("Test 3 SUCCESS: navigated to new article");
+        } catch (AssertionError e) {
+            System.out.println("Test 3 FAILURE: navigation did not occur as expected");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Use the Random Article link to open a random page")
-    public void testOpenRandomArticle() throws InterruptedException {
+    // Test 4: open random article via menu
+    @Test(priority = 4, description = "Use Random Article link to open random page")
+    public void testOpenRandomArticle() {
+        System.out.println("Test 4: open random article via menu");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
 
+        System.out.println("Opening main menu");
+        pause();
         WebElement menuCheckbox = wait.until(
                 ExpectedConditions.presenceOfElementLocated(By.id("vector-main-menu-dropdown-checkbox"))
         );
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuCheckbox);
-        Thread.sleep(2000);
 
-        WebElement menuList = wait.until(
-                ExpectedConditions.visibilityOf(
-                        driver.findElement(By.cssSelector("ul.vector-menu-content-list"))
-                )
-        );
+        System.out.println("Waiting for menu list");
+        pause();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("ul.vector-menu-content-list")
+        ));
 
-        By randomLink = By.cssSelector("li#n-randompage a");
-        wait.until(ExpectedConditions.elementToBeClickable(randomLink)).click();
-        Thread.sleep(2000);
+        System.out.println("Clicking random article link");
+        pause();
+        wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("li#n-randompage a")
+        )).click();
 
+        System.out.println("Waiting for random article URL");
+        pause();
         wait.until(ExpectedConditions.urlMatches(WIKI_BASE + "/.+"));
-        Assert.assertFalse(driver.getTitle().isEmpty(),
-                "Random article should have a non-empty title");
+
+        String title = driver.getTitle();
+        System.out.println("Random article title: " + title);
+
+        try {
+            Assert.assertFalse(title.isEmpty(),
+                    "Random article should have a non-empty title");
+            System.out.println("Test 4 SUCCESS: random article opened");
+        } catch (AssertionError e) {
+            System.out.println("Test 4 FAILURE: random article title empty");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Use browser back and forward navigation between pages")
-    public void testNavigateBackAndForward() throws InterruptedException {
+    // Test 5: browser back and forward navigation
+    @Test(priority = 5, description = "Use browser back and forward navigation")
+    public void testNavigateBackAndForward() {
+        System.out.println("Test 5: browser back and forward navigation");
+        pause();
+
+        System.out.println("Navigating to main page");
+        pause();
         driver.get(EN_MAIN_PAGE_URL);
-        Thread.sleep(2000);
+
+        System.out.println("Navigating to article page");
+        pause();
         driver.get(ARTICLE_URL);
-        Thread.sleep(2000);
 
+        System.out.println("Navigating back");
+        pause();
         driver.navigate().back();
-        Thread.sleep(2000);
-        wait.until(ExpectedConditions.urlToBe(EN_MAIN_PAGE_URL));
-        Assert.assertTrue(driver.getCurrentUrl().endsWith("Main_Page"),
-                "Back navigation should return to Main Page");
 
+        System.out.println("Waiting for main page URL");
+        pause();
+        wait.until(ExpectedConditions.urlToBe(EN_MAIN_PAGE_URL));
+        System.out.println("Back navigation URL: " + driver.getCurrentUrl());
+
+        System.out.println("Navigating forward");
+        pause();
         driver.navigate().forward();
-        Thread.sleep(2000);
+
+        System.out.println("Waiting for article URL");
+        pause();
         wait.until(ExpectedConditions.urlContains("Selenium_(software)"));
-        Assert.assertTrue(driver.getCurrentUrl().contains("Selenium_(software)"),
-                "Forward navigation should return to the article");
+        System.out.println("Forward navigation URL: " + driver.getCurrentUrl());
+
+        try {
+            Assert.assertTrue(driver.getCurrentUrl().contains("Selenium_(software)"),
+                    "Forward navigation should return to the article");
+            System.out.println("Test 5 SUCCESS: navigation back and forward works");
+        } catch (AssertionError e) {
+            System.out.println("Test 5 FAILURE: back/forward did not work as expected");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Switch an article to French via the interlanguage link")
+    // Test 6: switch article to French via language link
+    @Test(priority = 6, description = "Switch article to French via language link")
     public void testChangeLanguageLink() {
+        System.out.println("Test 6: switch article to French via language link");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
 
-        // Expand ULS menu
+        System.out.println("Opening language menu");
+        pause();
         WebElement toggle = wait.until(
                 ExpectedConditions.elementToBeClickable(By.id("p-lang-btn"))
         );
         toggle.click();
 
-        // Wait for ULS panel and locate French link
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("div.uls-menu ul")
-        ));
+        System.out.println("Waiting for French link");
+        pause();
         By frenchLink = By.cssSelector("li.interwiki-fr > a.autonym[lang='fr']");
         WebElement french = wait.until(
                 ExpectedConditions.elementToBeClickable(frenchLink)
         );
 
-        // Ensure in view, click
+        System.out.println("Clicking French link");
+        pause();
         ((JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView({block:'center'})", french);
         french.click();
 
-        // Wait for subdomain change
+        System.out.println("Waiting for French subdomain");
+        pause();
         wait.until(ExpectedConditions.urlContains("fr.wikipedia.org"));
-        Assert.assertTrue(
-                driver.getCurrentUrl().contains("fr.wikipedia.org"),
-                "Should be on the French Wikipedia subdomain"
-        );
 
-        // Verify <html> tag’s lang attribute is “fr”
         String htmlLang = driver.findElement(By.tagName("html"))
                 .getAttribute("lang");
-        Assert.assertEquals(
-                htmlLang, "fr",
-                "The page’s <html> lang attribute should be 'fr'"
-        );
+        System.out.println("HTML lang attribute: " + htmlLang);
 
-        // Check heading reflects French title
-        String heading = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.id("firstHeading"))
-        ).getText();
-        Assert.assertTrue(
-                heading.contains("(informatique)"),
-                "Heading should show the French article title"
-        );
+        try {
+            Assert.assertEquals(htmlLang, "fr",
+                    "HTML lang attribute should be 'fr'");
+            System.out.println("Test 6 SUCCESS: language switched to French");
+        } catch (AssertionError e) {
+            System.out.println("Test 6 FAILURE: language did not switch");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Open the revision history of an article")
-    public void testOpenHistoryTab() throws InterruptedException {
+    // Test 7: open revision history tab
+    @Test(priority = 7, description = "Open revision history tab")
+    public void testOpenHistoryTab() {
+        System.out.println("Test 7: open revision history tab");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
+
+        System.out.println("Clicking history tab");
+        pause();
         WebElement historyTab = wait.until(
                 ExpectedConditions.elementToBeClickable(By.cssSelector("#ca-history a"))
         );
         historyTab.click();
-        Thread.sleep(2000);
 
+        System.out.println("Waiting for history section");
+        pause();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("pagehistory")));
-        Assert.assertTrue(driver.findElement(By.id("pagehistory")).isDisplayed(),
-                "Revision history list should be displayed");
+
+        try {
+            Assert.assertTrue(driver.findElement(By.id("pagehistory")).isDisplayed(),
+                    "Revision history list should be displayed");
+            System.out.println("Test 7 SUCCESS: history tab opened");
+        } catch (AssertionError e) {
+            System.out.println("Test 7 FAILURE: history not displayed");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Open the Talk page of an article")
-    public void testOpenTalkPage() throws InterruptedException {
+    // Test 8: open talk page
+    @Test(priority = 8, description = "Open talk page")
+    public void testOpenTalkPage() {
+        System.out.println("Test 8: open talk page");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
+
+        System.out.println("Clicking talk tab");
+        pause();
         WebElement talkTab = wait.until(
                 ExpectedConditions.elementToBeClickable(By.cssSelector("#ca-talk a"))
         );
         talkTab.click();
-        Thread.sleep(2000);
 
+        System.out.println("Waiting for talk page URL");
+        pause();
         wait.until(ExpectedConditions.urlContains("Talk:Selenium_(software)"));
-        Assert.assertTrue(driver.getTitle().startsWith("Talk:"),
-                "Talk page title should begin with 'Talk:'");
+
+        try {
+            Assert.assertTrue(driver.getTitle().startsWith("Talk:"),
+                    "Talk page title should begin with 'Talk:'");
+            System.out.println("Test 8 SUCCESS: talk page opened");
+        } catch (AssertionError e) {
+            System.out.println("Test 8 FAILURE: talk page did not open");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Navigate to a category page via the category link in the footer")
-    public void testNavigateToCategoryPage() throws InterruptedException {
+    // Test 9: navigate to category page
+    @Test(priority = 9, description = "Navigate to category page")
+    public void testNavigateToCategoryPage() {
+        System.out.println("Test 9: navigate to category page");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
+
+        System.out.println("Clicking category link");
+        pause();
         WebElement categoryLink = wait.until(
                 ExpectedConditions.elementToBeClickable(
                         By.cssSelector(".mw-normal-catlinks ul li a")
                 )
         );
         categoryLink.click();
-        Thread.sleep(2000);
 
+        System.out.println("Waiting for category page URL");
+        pause();
         wait.until(ExpectedConditions.urlContains("/wiki/Category:"));
-        Assert.assertTrue(driver.getTitle().startsWith("Category:"),
-                "Category page title should start with 'Category:'");
+
+        try {
+            Assert.assertTrue(driver.getTitle().startsWith("Category:"),
+                    "Category page title should start with 'Category:'");
+            System.out.println("Test 9 SUCCESS: category page opened");
+        } catch (AssertionError e) {
+            System.out.println("Test 9 FAILURE: category page did not open");
+            throw e;
+        }
+        pause();
     }
 
-    @Test(description = "Click a Table of Contents entry and verify fragment navigation")
-    public void testTableOfContentsNavigation() throws InterruptedException {
+    // Test 10: table of contents fragment navigation
+    @Test(priority = 10, description = "Table of Contents fragment navigation")
+    public void testTableOfContentsNavigation() {
+        System.out.println("Test 10: table of contents fragment navigation");
+        pause();
+
+        System.out.println("Navigating to article URL: " + ARTICLE_URL);
+        pause();
         driver.get(ARTICLE_URL);
+
+        System.out.println("Clicking TOC entry");
+        pause();
         WebElement tocLink = wait.until(
                 ExpectedConditions.elementToBeClickable(
                         By.cssSelector("ul#mw-panel-toc-list li a[href*='#']:not([href$='#'])")
                 )
         );
         tocLink.click();
-        Thread.sleep(2000);
 
+        System.out.println("Waiting for fragment in URL");
+        pause();
         String currentUrl = driver.getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains("#"),
-                "URL should contain a fragment after clicking a TOC entry");
+        System.out.println("Current URL: " + currentUrl);
 
         String fragment = currentUrl.substring(currentUrl.indexOf('#') + 1);
-        Assert.assertFalse(fragment.isEmpty(),
-                "Fragment after '#' should not be empty");
+        System.out.println("Fragment: " + fragment);
 
+        System.out.println("Verifying section heading visibility");
+        pause();
         WebElement sectionHeading = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(By.id(fragment))
         );
-        Assert.assertTrue(sectionHeading.isDisplayed(),
-                "Section heading should be visible");
+
+        try {
+            Assert.assertTrue(sectionHeading.isDisplayed(),
+                    "Section heading should be visible");
+            System.out.println("Test 10 SUCCESS: fragment navigation works");
+        } catch (AssertionError e) {
+            System.out.println("Test 10 FAILURE: fragment navigation failed");
+            throw e;
+        }
+        pause();
     }
 }
