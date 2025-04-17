@@ -39,46 +39,36 @@ public class NavigationTest {
     @BeforeClass
     public static void globalSetup() {
         System.out.println("BeforeClass: setup WebDriverManager");
-        pause();
         WebDriverManager.chromedriver().setup();
         System.out.println("BeforeClass: WebDriverManager ready");
-        pause();
     }
 
     @BeforeMethod
     public void setUp() {
         System.out.println("BeforeMethod: starting browser session");
-        pause();
         ChromeOptions options = new ChromeOptions().addArguments("--start-maximized");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         System.out.println("BeforeMethod: navigating to main page");
-        pause();
         driver.get(EN_MAIN_PAGE_URL);
         System.out.println("BeforeMethod: main page loaded");
-        pause();
     }
 
     @AfterMethod
     public void tearDown() {
         System.out.println("AfterMethod: closing browser session");
-        pause();
         if (driver != null) {
             driver.quit();
         }
         System.out.println("AfterMethod: browser closed");
-        pause();
     }
 
     // Test 1: verify portal page loads with 'Wikipedia' in title
     @Test(priority = 1, description = "Verify portal page loads with 'Wikipedia' in title")
     public void testOpenHomePage() {
         System.out.println("Test 1: verify portal page loads with 'Wikipedia' in title");
-        pause();
-
         System.out.println("Navigating to portal URL: " + PORTAL_URL);
-        pause();
         driver.get(PORTAL_URL);
 
         System.out.println("Retrieving page title");
@@ -101,10 +91,7 @@ public class NavigationTest {
     @Test(priority = 2, description = "From an article, click logo to return to main page")
     public void testClickLogoReturnsHome() {
         System.out.println("Test 2: click logo to return to main page");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Waiting for logo element");
@@ -139,10 +126,7 @@ public class NavigationTest {
     @Test(priority = 3, description = "Click first internal link in article content")
     public void testClickFirstInternalLink() {
         System.out.println("Test 3: click first internal link in article content");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Waiting for first internal link");
@@ -184,10 +168,7 @@ public class NavigationTest {
     @Test(priority = 4, description = "Use Random Article link to open random page")
     public void testOpenRandomArticle() {
         System.out.println("Test 4: open random article via menu");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Opening main menu");
@@ -231,10 +212,7 @@ public class NavigationTest {
     @Test(priority = 5, description = "Use browser back and forward navigation")
     public void testNavigateBackAndForward() {
         System.out.println("Test 5: browser back and forward navigation");
-        pause();
-
         System.out.println("Navigating to main page");
-        pause();
         driver.get(EN_MAIN_PAGE_URL);
 
         System.out.println("Navigating to article page");
@@ -274,10 +252,7 @@ public class NavigationTest {
     @Test(priority = 6, description = "Switch article to French via language link")
     public void testChangeLanguageLink() {
         System.out.println("Test 6: switch article to French via language link");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Opening language menu");
@@ -323,10 +298,7 @@ public class NavigationTest {
     @Test(priority = 7, description = "Open revision history tab")
     public void testOpenHistoryTab() {
         System.out.println("Test 7: open revision history tab");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Clicking history tab");
@@ -355,10 +327,7 @@ public class NavigationTest {
     @Test(priority = 8, description = "Open talk page")
     public void testOpenTalkPage() {
         System.out.println("Test 8: open talk page");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Clicking talk tab");
@@ -387,10 +356,7 @@ public class NavigationTest {
     @Test(priority = 9, description = "Navigate to category page")
     public void testNavigateToCategoryPage() {
         System.out.println("Test 9: navigate to category page");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Clicking category link");
@@ -421,10 +387,7 @@ public class NavigationTest {
     @Test(priority = 10, description = "Table of Contents fragment navigation")
     public void testTableOfContentsNavigation() {
         System.out.println("Test 10: table of contents fragment navigation");
-        pause();
-
         System.out.println("Navigating to article URL: " + ARTICLE_URL);
-        pause();
         driver.get(ARTICLE_URL);
 
         System.out.println("Clicking TOC entry");
