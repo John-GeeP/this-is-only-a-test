@@ -36,8 +36,20 @@ public class ContentTest {
     private final String SAMPLE_ARTICLE_URL = "https://en.wikipedia.org/wiki/Java_(programming_language)";
     private final String MAIN_PAGE_URL = "https://en.wikipedia.org/wiki/Main_Page";
 
+    // Pause helper: delay for visibility
+    public static void pause() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Pause interrupted: " + e.getMessage());
+        }
+    }
+
     @BeforeClass
     public void setUp() {
+        System.out.println("BeforeClass: initializing WebDriverManager and browser");
+        pause();
         // Use WebDriverManager to automatically manage the ChromeDriver
         try {
             io.github.bonigarcia.wdm.WebDriverManager.chromedriver().setup();
@@ -47,6 +59,8 @@ public class ContentTest {
             driver = new ChromeDriver(options);
             driver.manage().window().maximize();
             wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            System.out.println("BeforeClass: browser session started");
+            pause();
         } catch (Exception e) {
             System.err.println("Failed to initialize WebDriver: " + e.getMessage());
             e.printStackTrace();
@@ -60,8 +74,13 @@ public class ContentTest {
      */
     @Test(priority = 1)
     public void testFeaturedArticleSection() {
+        System.out.println("Test 1: Validate Featured Article Section");
+        System.out.println("Navigating to main page: " + MAIN_PAGE_URL);
         driver.get(MAIN_PAGE_URL);
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mp-tfa")));
+        System.out.println("Featured Article section is visible");
+        pause();
 
         WebElement featuredArticleSection = driver.findElement(By.id("mp-tfa"));
         String featuredArticleText = featuredArticleSection.getText();
@@ -69,6 +88,7 @@ public class ContentTest {
         Assert.assertTrue(featuredArticleSection.isDisplayed(), "Featured article section is not displayed");
         Assert.assertFalse(featuredArticleText.isEmpty(), "Featured article section is empty");
         Assert.assertTrue(featuredArticleText.length() > 100, "Featured article content is too short");
+        System.out.println("Test 1 SUCCESS: Featured article section validated");
     }
 
     /**
@@ -78,15 +98,16 @@ public class ContentTest {
      */
     @Test(priority = 2)
     public void testLanguageLinks() {
+        System.out.println("Test 2: Check Language Links");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
-        // In the latest Wikipedia versions, language links are often in a dropdown menu
-        // rather than visible by default
         System.out.println("Testing language links with multiple approaches");
+        pause();
         List<WebElement> languageLinks = new java.util.ArrayList<>();
 
         try {
-            // First approach: Look for a language button that can be clicked
+            // First approach: Look for language button that can be clicked
             try {
                 // Look for various language selector buttons that might exist
                 WebElement languageButton = driver.findElement(
@@ -95,27 +116,35 @@ public class ContentTest {
                                 "a[data-jsl10n='otherlanguages']"));
 
                 System.out.println("Found language button, attempting to click");
+                pause();
                 languageButton.click();
-                Thread.sleep(1000); // Short pause to let any dropdowns appear
+                pause(); // Short pause to let dropdowns appear
 
                 // After clicking, look for language links in dropdowns or popups
                 languageLinks = driver.findElements(
                         By.cssSelector(".uls-language-list a, .interlanguage-link a, " +
                                 ".mw-interlanguage-selector + * a"));
+                System.out.println("Language links found via dropdown");
+                pause();
             } catch (Exception e) {
                 System.out.println("Could not find or click language button: " + e.getMessage());
+                pause();
             }
 
             // Second approach: Look directly for interlanguage links without clicking
             if (languageLinks.isEmpty()) {
                 System.out.println("Looking for interlanguage links without clicking");
+                pause();
                 languageLinks = driver.findElements(
                         By.cssSelector(".interlanguage-link a, .mw-interwiki-container a"));
+                System.out.println("Language links found directly");
+                pause();
             }
 
-            // Third approach: If still no luck, look for links to other language versions
+            // Third approach: Look for links to other language versions
             if (languageLinks.isEmpty()) {
                 System.out.println("Looking for links that match language patterns");
+                pause();
                 List<WebElement> allLinks = driver.findElements(By.tagName("a"));
 
                 for (WebElement link : allLinks) {
@@ -125,29 +154,32 @@ public class ContentTest {
                         languageLinks.add(link);
                     }
                 }
+                System.out.println("Language links found via pattern");
+                pause();
             }
 
             System.out.println("Found " + languageLinks.size() + " language links");
+            pause();
 
-            // If we found any language links at all, consider that a success
-            // Modern Wikipedia varies widely in how it presents language options
+            // If found any language links, consider test success
             if (!languageLinks.isEmpty()) {
                 WebElement link = languageLinks.get(0);
                 String href = link.getAttribute("href");
                 Assert.assertNotNull(href, "Language link should have href attribute");
-                Assert.assertTrue(href.startsWith("http"), "Language link should have valid URL: " + href);
+                pause();
+                Assert.assertTrue(href.startsWith("http"),
+                        "Language link should have valid URL: " + href);
+                System.out.println("Test 2 SUCCESS: Language links validated");
             } else {
                 System.out.println("WARNING: No language links found. This may be due to:");
                 System.out.println("1. The article doesn't have translations");
                 System.out.println("2. Wikipedia's UI has changed and language links are available via a different mechanism");
                 System.out.println("3. Language links require more complex user interactions to access");
             }
-
         } catch (Exception e) {
             System.out.println("Exception in language links test: " + e.getMessage());
             e.printStackTrace();
-            // We'll pass this test regardless since language links are not critical functionality
-            // and Wikipedia's UI changes frequently
+            pause();
         }
     }
 
@@ -157,12 +189,16 @@ public class ContentTest {
      */
     @Test(priority = 3)
     public void testTableOfContents() {
+        System.out.println("Test 3: Verify Table of Contents");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.visibilityOfElementLocated(By.id("toc")),
                 ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".vector-toc, .mw-table-of-contents"))
         ));
+        System.out.println("TOC is visible");
+        pause();
 
         WebElement toc = null;
         try {
@@ -174,6 +210,7 @@ public class ContentTest {
                 System.out.println("Could not find TOC using standard selectors, trying alternative approach");
             }
         }
+        pause();
 
         List<WebElement> tocLinks;
         if (toc != null) {
@@ -183,8 +220,10 @@ public class ContentTest {
             tocLinks = driver.findElements(By.cssSelector(".mw-headline"));
             Assert.assertTrue(tocLinks.size() > 0, "No headings found in the article");
         }
+        pause();
 
         Assert.assertTrue(tocLinks.size() > 2, "Article should have at least 3 sections but found " + tocLinks.size());
+        pause();
 
         boolean hasHistorySection = false;
         boolean hasSyntaxSection = false;
@@ -202,9 +241,11 @@ public class ContentTest {
                 hasFeatureSection = true;
             }
         }
+        pause();
 
         Assert.assertTrue(hasHistorySection || hasSyntaxSection || hasFeatureSection,
                 "Article should include either History, Syntax, or Features section");
+        System.out.println("Test 3 SUCCESS: Table of Contents validated");
     }
 
     /**
@@ -213,19 +254,27 @@ public class ContentTest {
      */
     @Test(priority = 4)
     public void testExternalLinks() {
+        System.out.println("Test 4: Validate External Links");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
-        // Scroll to the external links section
+        // Scroll to external links section
+        System.out.println("Scrolling to bottom of page");
+        pause();
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        pause();
 
         try {
             wait.until(ExpectedConditions.or(
                     ExpectedConditions.visibilityOfElementLocated(By.id("External_links")),
-                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(text(), 'External links')]"))
-            ));
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(text(), 'External links')]")
+                    )));
+            System.out.println("External Links heading is visible");
+            pause();
         } catch (Exception e) {
-            System.out.println("External Links heading not found, will look for any external links in the page");
+            System.out.println("External Links heading not found, look for any external links in the page");
+            pause();
         }
 
         List<WebElement> externalLinks = new java.util.ArrayList<>();
@@ -235,6 +284,8 @@ public class ContentTest {
                     By.xpath("//span[@id='External_links']/ancestor::h2/following-sibling::ul[1]")
             );
             externalLinks = externalLinksSection.findElements(By.tagName("a"));
+            System.out.println("Found external links in section");
+            pause();
         } catch (Exception e) {
             try {
                 externalLinks = driver.findElements(By.cssSelector(".external"));
@@ -247,19 +298,25 @@ public class ContentTest {
                         }
                     }
                 }
+                System.out.println("Found external links via generic search");
+                pause();
             } catch (Exception e2) {
                 System.out.println("Could not find external links: " + e2.getMessage());
+                pause();
             }
         }
 
         System.out.println("Found " + externalLinks.size() + " external links");
         Assert.assertTrue(externalLinks.size() > 0, "Article should have at least one external link");
+        pause();
 
         if (!externalLinks.isEmpty()) {
             WebElement firstLink = externalLinks.get(0);
             String href = firstLink.getAttribute("href");
             Assert.assertNotNull(href, "External link should have href attribute");
+            pause();
             Assert.assertTrue(href.startsWith("http"), "External link should have valid URL format");
+            System.out.println("Test 4 SUCCESS: External links validated");
         }
     }
 
@@ -269,10 +326,13 @@ public class ContentTest {
      */
     @Test(priority = 5)
     public void testImagePresence() {
+        System.out.println("Test 5: Check Image Presence");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         List<WebElement> images = driver.findElements(By.cssSelector(".infobox img"));
         Assert.assertTrue(images.size() > 0, "Article should have at least one image in the infobox");
+        pause();
 
         WebElement firstImage = images.get(0);
         String src = firstImage.getAttribute("src");
@@ -281,6 +341,7 @@ public class ContentTest {
         Assert.assertNotNull(src, "Image should have src attribute");
         Assert.assertTrue(src.startsWith("http"), "Image source should be a valid URL");
         Assert.assertNotNull(alt, "Image should have alt text for accessibility");
+        System.out.println("Test 5 SUCCESS: Image presence validated");
     }
 
     /**
@@ -289,21 +350,30 @@ public class ContentTest {
      */
     @Test(priority = 6)
     public void testReferencesSection() {
+        System.out.println("Test 6: Validate References Section");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         // Scroll to the references section
+        System.out.println("Scrolling to references section");
+        pause();
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollTo(0, document.body.scrollHeight * 0.8)");
+        pause();
 
         WebElement referencesSection = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(By.id("References"))
         );
+        System.out.println("References section is visible");
+        pause();
 
         Assert.assertTrue(referencesSection.isDisplayed(), "References section should be present");
+        pause();
 
         List<WebElement> references = driver.findElements(By.cssSelector(".references li"));
         Assert.assertTrue(references.size() >= 5,
                 "References section should have at least 5 references but found " + references.size());
+        System.out.println("Test 6 SUCCESS: References section validated");
     }
 
     /**
@@ -312,19 +382,28 @@ public class ContentTest {
      */
     @Test(priority = 7)
     public void testCitationFormat() {
+        System.out.println("Test 7: Check Citation Format");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         // Scroll to the references section
+        System.out.println("Scrolling to citations section");
+        pause();
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollTo(0, document.body.scrollHeight * 0.8)");
+        pause();
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.className("references")));
+        System.out.println("References container is present");
+        pause();
 
         List<WebElement> citations = driver.findElements(By.cssSelector(".references cite"));
         Assert.assertTrue(citations.size() > 0, "Citations should use <cite> tags");
+        pause();
 
         List<WebElement> citationLinks = driver.findElements(By.cssSelector(".references a.external"));
         Assert.assertTrue(citationLinks.size() > 0, "At least one citation should contain external links");
+        System.out.println("Test 7 SUCCESS: Citation format validated");
     }
 
     /**
@@ -333,18 +412,25 @@ public class ContentTest {
      */
     @Test(priority = 8)
     public void testInfoboxContent() {
+        System.out.println("Test 8: Verify Infobox Content");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         WebElement infobox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("infobox")));
+        System.out.println("Infobox is visible");
+        pause();
         Assert.assertTrue(infobox.isDisplayed(), "Infobox should be displayed");
+        pause();
 
         List<WebElement> rows = infobox.findElements(By.tagName("tr"));
         Assert.assertTrue(rows.size() >= 3, "Infobox should have at least 3 rows of information");
+        pause();
 
         String infoboxText = infobox.getText().toLowerCase();
         Assert.assertTrue(infoboxText.contains("paradigm") || infoboxText.contains("developer") ||
                         infoboxText.contains("version"),
                 "Infobox should contain key details like paradigm, developer, or version");
+        System.out.println("Test 8 SUCCESS: Infobox content validated");
     }
 
     /**
@@ -353,11 +439,16 @@ public class ContentTest {
      */
     @Test(priority = 9)
     public void testRelatedArticles() {
+        System.out.println("Test 9: Check Related Articles");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         // Scroll down to where the "See also" section would typically be
+        System.out.println("Scrolling to See also section");
+        pause();
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollTo(0, document.body.scrollHeight * 0.7)");
+        pause();
 
         try {
             boolean seeAlsoFound = false;
@@ -371,13 +462,17 @@ public class ContentTest {
                 if (seeAlsoHeading != null) {
                     seeAlsoFound = true;
                     System.out.println("Found See also section");
+                    pause();
                     WebElement seeAlsoSection = driver.findElement(
                             By.xpath("//span[@id='See_also' or contains(text(), 'See also')]/ancestor::h2/following-sibling::ul[1]")
                     );
                     relatedLinks = seeAlsoSection.findElements(By.tagName("a"));
+                    System.out.println("Related links found in See also section");
+                    pause();
                 }
             } catch (Exception e) {
                 System.out.println("No standard See also section found, trying alternative approach");
+                pause();
             }
 
             if (!seeAlsoFound || relatedLinks.isEmpty()) {
@@ -392,21 +487,27 @@ public class ContentTest {
                         }
                     }
                 }
+                System.out.println("Related links found via generic search");
+                pause();
             }
 
             System.out.println("Found " + relatedLinks.size() + " related links");
+            pause();
 
             if (!relatedLinks.isEmpty()) {
                 WebElement firstLink = relatedLinks.get(0);
                 String href = firstLink.getAttribute("href");
                 Assert.assertNotNull(href, "Related article link should have href attribute");
+                pause();
                 Assert.assertTrue(href.contains("wikipedia.org/wiki/"),
                         "Related article should link to another Wikipedia page");
+                System.out.println("Test 9 SUCCESS: Related articles validated");
             } else {
                 System.out.println("No related links found on the page");
             }
         } catch (Exception e) {
             System.out.println("The 'See also' section or related articles could not be found: " + e.getMessage());
+            pause();
         }
     }
 
@@ -416,23 +517,30 @@ public class ContentTest {
      */
     @Test(priority = 10)
     public void testPageFooter() {
+        System.out.println("Test 10: Validate Page Footer");
+        System.out.println("Navigating to article: " + SAMPLE_ARTICLE_URL);
         driver.get(SAMPLE_ARTICLE_URL);
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
+        System.out.println("Scrolling to bottom of page for footer");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        pause();
 
         WebElement footer;
         try {
             footer = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.cssSelector("#footer, .mw-footer, footer")));
+            System.out.println("Footer is visible");
+            pause();
             String footerText = footer.getText().toLowerCase();
 
             boolean hasPrivacyPolicy = footerText.contains("privacy") ||
                     driver.findElements(By.linkText("Privacy policy")).size() > 0;
             boolean hasTerms = footerText.contains("terms") ||
-                    driver.findElements(By.linkText("Terms of Use")).size() > 0;
+                    driver.findElements(By.partialLinkText("Terms of Use")).size() > 0;
             boolean hasAbout = footerText.contains("about wikipedia") ||
                     driver.findElements(By.partialLinkText("About")).size() > 0;
+            pause();
 
             Assert.assertTrue(hasPrivacyPolicy, "Footer should contain link to Privacy Policy");
             Assert.assertTrue(hasTerms, "Footer should contain link to Terms of Use");
@@ -442,11 +550,13 @@ public class ContentTest {
                     footerText.contains("copyright") ||
                     footerText.contains("wikimedia foundation") ||
                     driver.findElements(By.cssSelector(".copyright")).size() > 0;
+            pause();
 
             Assert.assertTrue(hasCopyright, "Footer should contain copyright information");
-
+            System.out.println("Test 10 SUCCESS: Page footer validated");
         } catch (Exception e) {
             System.out.println("Could not find standard footer, looking for footer elements directly");
+            pause();
             List<WebElement> allLinks = driver.findElements(By.tagName("a"));
             boolean hasPrivacyLink = false;
             boolean hasTermsLink = false;
@@ -465,16 +575,21 @@ public class ContentTest {
                     break;
                 }
             }
+            pause();
 
             Assert.assertTrue(hasPrivacyLink || hasTermsLink || hasAboutLink,
                     "Page should contain at least one of: Privacy Policy, Terms of Use, or About Wikipedia links");
+            System.out.println("Test 10 SUCCESS: Alternative footer links validated");
         }
     }
 
     @AfterClass
     public void tearDown() {
+        System.out.println("AfterClass: closing browser session");
+        pause();
         if (driver != null) {
             driver.quit();
         }
+        System.out.println("AfterClass: browser closed");
     }
 }
