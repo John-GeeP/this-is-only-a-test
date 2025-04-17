@@ -1,4 +1,4 @@
-# this-is-only-a-test: Wikipedia Automation Testing Project
+# this-is-only-a-test: A Wikipedia Automation Testing Project
 
 This project demonstrates basic automation testing on Wikipedia using Selenium, TestNG, and Maven. It is organized as a multi‑module Maven project where each module addresses a distinct testing area:
 
@@ -13,6 +13,7 @@ This project demonstrates basic automation testing on Wikipedia using Selenium, 
 this-is-only-a-test/
 ├── .gitignore
 ├── README.md
+├── testng.xml
 ├── pom.xml
 ├── module1-jgp-navigation/
 │   ├── pom.xml
@@ -22,17 +23,17 @@ this-is-only-a-test/
 ├── module2-tmi-authentication/
 │   ├── pom.xml
 │   └── src/
-│       └── test/java/edu/tmi/AuthenticationTest.java
+│   │   └── test/java/edu/tmi/AuthenticationTest.java
 │   └── testng.xml
 ├── module3-sen-content/
 │   ├── pom.xml
 │   └── src/
-│       └── test/java/edu/sen/ContentTest.java
+│   │   └── test/java/edu/sen/ContentTest.java
 │   └── testng.xml
 └── module4-chf-search/
     ├── pom.xml
     └── src/
-        └── test/java/edu/chf/SearchTest.java
+    │   └── test/java/edu/chf/SearchTest.java
     └── testng.xml
 ```
 
@@ -60,27 +61,19 @@ This command will compile all modules and install the artifacts into your local 
 
 You can run tests for individual modules or for all modules together. For example, to run the content tests (module3):
 
-Navigate to the module directory:
+Run a single module:
 
 ```bash
-cd module3-sen-content
+mvn -pl module1-jgp-navigation test
 ```
 
-Run the tests using Maven:
+Run all tests:
 
 ```bash
 mvn clean test
 ```
 
 Alternatively, open the corresponding `testng.xml` file in your IDE (IntelliJ IDEA, Eclipse, etc.) and run the suite directly.
-
-## Future Development
-
-Future enhancements include:
-
-- Fully implementing navigation, authentication, and search modules.
-- Extending functionality to cover scenarios such as clicking links, switching modes, signing in/out, editing articles, etc.
-- Refining test assertions and integrating continuous integration.
 
 ## License
 
