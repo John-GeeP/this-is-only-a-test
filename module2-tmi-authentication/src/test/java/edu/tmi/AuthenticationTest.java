@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
 import java.time.Duration;
 import java.util.List;
 
-public class Main {
+public class AuthenticationTest {
     // Hardcoded test credentials
     private static final String username = "Meeatbaag";
     private static final String password = "Hkforty7!";
@@ -222,7 +222,7 @@ public class Main {
         System.out.println("TEST PASSED: Password field is masked (type=\"password\")");
     }
 
-    @Test(priority = 6, dataProvider = "sqlInjectionProvider")
+    @Test(priority = 7, dataProvider = "sqlInjectionProvider")
     public void testSqlInjectionPrevention(String sqlInjection) {
         System.out.println("\nTest Case: Test SQL injection prevention with: " + sqlInjection);
 
@@ -266,7 +266,7 @@ public class Main {
         System.out.println("  LOGIN TEST PASSED: Successfully logged in with valid credentials");
     }
 
-    @Test(priority = 7, dependsOnMethods = "testSuccessfulLogin")
+    @Test(priority = 6, dependsOnMethods = "testSuccessfulLogin")
     public void testSuccessfulLogout() {
         System.out.println("\nTest Case: Verify successful logout after login");
 
