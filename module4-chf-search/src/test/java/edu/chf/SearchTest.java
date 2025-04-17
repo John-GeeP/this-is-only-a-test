@@ -22,6 +22,18 @@ public class SearchTest {
 
     private static final String BASE_URL = "https://www.wikipedia.org/";
 
+    // Add a constant for the delay between actions
+    private static final int ACTION_DELAY_MS = 2000; // 2 seconds delay
+
+    // Helper method to add delay between actions
+    private void delayBetweenActions() {
+        try {
+            Thread.sleep(ACTION_DELAY_MS);
+        } catch (InterruptedException e) {
+            System.out.println("Sleep interrupted: " + e.getMessage());
+        }
+    }
+
     @BeforeClass
     public static void globalSetup() {
         WebDriverManager.chromedriver().setup();
@@ -50,10 +62,12 @@ public class SearchTest {
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
         searchInput.sendKeys("Albert Einstein");
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.titleContains("Albert Einstein"));
         Assert.assertTrue(driver.getTitle().contains("Albert Einstein"),
                 "Page title should contain 'Albert Einstein'");
+        delayBetweenActions();
     }
 
     @Test(priority = 2, description = "Search with multiple keywords")
@@ -62,7 +76,9 @@ public class SearchTest {
         WebElement searchInput = wait.until(
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
+        delayBetweenActions();
         searchInput.sendKeys("quantum physics nobel prize");
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.className("mw-search-results")));
         String text = driver.findElement(By.className("mw-search-results")).getText().toLowerCase();
@@ -78,7 +94,10 @@ public class SearchTest {
         WebElement searchInput = wait.until(
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
+        delayBetweenActions();
         searchInput.sendKeys("C++");
+        delayBetweenActions();
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("C++"),
@@ -121,6 +140,7 @@ public class SearchTest {
 
         // Clear and submit empty search
         searchInput.clear();
+        delayBetweenActions();
         searchInput.submit();
 
         // Wait until either staying on the same URL or landing on search results page
@@ -130,6 +150,7 @@ public class SearchTest {
         ));
 
         String currentUrl = driver.getCurrentUrl();
+        delayBetweenActions();
 
         // Assert that behavior matches one of two acceptable outcomes
         Assert.assertTrue(
@@ -146,6 +167,7 @@ public class SearchTest {
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
         searchInput.sendKeys("Madrid");
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.titleContains("Madrid"));
         String content = driver.findElement(By.id("mw-content-text")).getText().toLowerCase();
@@ -163,6 +185,7 @@ public class SearchTest {
         for (char c : phrase.toCharArray()) {
             searchInput.sendKeys(String.valueOf(c));
         }
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("To be, or not to be"),
@@ -173,6 +196,7 @@ public class SearchTest {
                 body.contains("to be or not to be"),
                 "Results should contain the exact phrase 'to be or not to be'"
         );
+        delayBetweenActions();
     }
 
     @Test(priority = 8, description = "Search with numbers and dates (World War 1914)")
@@ -182,6 +206,7 @@ public class SearchTest {
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
         searchInput.sendKeys("World War 1914");
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("World War"),
@@ -199,16 +224,19 @@ public class SearchTest {
         driver.get(BASE_URL);
         WebElement input = wait.until(ExpectedConditions.elementToBeClickable(By.id("searchInput")));
         input.sendKeys("python programming");
+        delayBetweenActions();
         input.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("Python"),
                 ExpectedConditions.presenceOfElementLocated(By.className("mw-search-results"))
         ));
         String lowerUrl = driver.getCurrentUrl();
+        delayBetweenActions();
 
         driver.get(BASE_URL);
         WebElement input2 = wait.until(ExpectedConditions.elementToBeClickable(By.id("searchInput")));
         input2.sendKeys("Python Programming");
+        delayBetweenActions();
         input2.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("Python"),
@@ -217,6 +245,7 @@ public class SearchTest {
         String upperUrl = driver.getCurrentUrl();
         Assert.assertEquals(lowerUrl, upperUrl,
                 "Search should be case-insensitive and yield same URL");
+        delayBetweenActions();
     }
 
     @Test(priority = 10, description = "Misspelled search suggestion or redirect for Einstein")
@@ -226,11 +255,13 @@ public class SearchTest {
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
         searchInput.sendKeys("Albrt Einstien");
+        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("Einstein"),
                 ExpectedConditions.presenceOfElementLocated(By.className("mw-search-results"))
         ));
+        delayBetweenActions();
         String body = driver.findElement(By.tagName("body")).getText();
         Assert.assertTrue(
                 body.toLowerCase().contains("einstein"),
