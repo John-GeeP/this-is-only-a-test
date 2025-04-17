@@ -218,33 +218,50 @@ public class SearchTest {
         );
     }
 
-    @Test(priority = 9, description = "Search case sensitivity check")
+    @Test(priority = 9, description = "Search case sensitivity check via canonical URL")
     public void testSearchCaseSensitivity() {
         driver.get(BASE_URL);
-        WebElement input = wait.until(ExpectedConditions.elementToBeClickable(By.id("searchInput")));
-        input.sendKeys("python programming");
-        delayBetweenActions();
-        input.submit();
+
+        // Lower‑case search
+        WebElement input1 = wait.until(
+                ExpectedConditions.elementToBeClickable(By.id("searchInput")));
+        input1.clear();
+        input1.sendKeys("python programming");
+        input1.submit();
+        // Wait until either article or results page loads
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("Python"),
                 ExpectedConditions.presenceOfElementLocated(By.className("mw-search-results"))
         ));
-        String lowerUrl = driver.getCurrentUrl();
-        delayBetweenActions();
 
+        // Grab canonical URL from page <head>
+        String canonicalLower = driver
+                .findElement(By.cssSelector("link[rel='canonical']"))
+                .getAttribute("href");
+
+        // Back to home and upper‑case search
         driver.get(BASE_URL);
-        WebElement input2 = wait.until(ExpectedConditions.elementToBeClickable(By.id("searchInput")));
+
+        WebElement input2 = wait.until(
+                ExpectedConditions.elementToBeClickable(By.id("searchInput")));
+        input2.clear();
         input2.sendKeys("Python Programming");
-        delayBetweenActions();
         input2.submit();
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.titleContains("Python"),
                 ExpectedConditions.presenceOfElementLocated(By.className("mw-search-results"))
         ));
-        String upperUrl = driver.getCurrentUrl();
-        Assert.assertEquals(lowerUrl, upperUrl,
-                "Search should be case-insensitive and yield same URL");
-        delayBetweenActions();
+
+        String canonicalUpper = driver
+                .findElement(By.cssSelector("link[rel='canonical']"))
+                .getAttribute("href");
+
+        // Assert that both searches arrive at same canonical resource
+        Assert.assertEquals(
+                canonicalLower,
+                canonicalUpper,
+                "Search should be case-insensitive and resolve to the same canonical URL"
+        );
     }
 
     @Test(priority = 10, description = "Misspelled search suggestion or redirect for Einstein")
