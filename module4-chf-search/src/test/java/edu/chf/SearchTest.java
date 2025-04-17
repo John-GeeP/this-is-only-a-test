@@ -167,7 +167,6 @@ public class SearchTest {
                 ExpectedConditions.elementToBeClickable(By.id("searchInput"))
         );
         searchInput.sendKeys("Madrid");
-        delayBetweenActions();
         searchInput.submit();
         wait.until(ExpectedConditions.titleContains("Madrid"));
         String content = driver.findElement(By.id("mw-content-text")).getText().toLowerCase();
